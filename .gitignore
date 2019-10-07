@@ -12,5 +12,5 @@
 *.out
 
 # binary and package folders
-/bin
-/pkg
+#/bin
+#/pkg
