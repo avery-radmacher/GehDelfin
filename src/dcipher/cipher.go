@@ -339,7 +339,7 @@ func NewCipher(initVector [16]byte) Cipher {
 	}
 	LFSRs[0] = uint32((initInts[0] << 9) | (initInts[1] << 1) | (initInts[2] >> 7))
 	LFSRs[1] = uint32(((initInts[2] & 127) << 11) | (initInts[3] << 3) | (initInts[4] >> 5))
-	LFSRs[2] = uint32(((initInts[4] & 7) << 14) | (initInts[5] << 6) | (initInts[6] >> 2))
+	LFSRs[2] = uint32(((initInts[4] & 7) << 14) | (initInts[5] << 6) | (initInts[6] >> 2)) // TODO why not ... & 31 ? ignoring two bits.
 	LFSRs[3] = uint32(((initInts[6] & 3) << 19) | (initInts[7] << 11) | (initInts[8] << 3) | (initInts[9] >> 5))
 	LFSRs[4] = uint32(((initInts[9] & 31) << 18) | (initInts[10] << 10) | (initInts[11] << 2) | (initInts[12] >> 6))
 	SRTaps[0] = tapCodes[0][initVector[12]&63]
@@ -347,7 +347,7 @@ func NewCipher(initVector [16]byte) Cipher {
 	SRTaps[2] = tapCodes[2][(initVector[13]&3)<<4|(initVector[14]>>4)]
 	SRTaps[3] = tapCodes[3][(initVector[14]&15)<<2|(initVector[15]>>6)]
 	SRTaps[4] = tapCodes[4][initVector[15]&63]
-	return Cipher{[5]uint32{0xFFFFFFFF}, [5]uint32{0xFFFFFFFF}}
+	return Cipher{LFSRs, SRTaps}
 }
 
 // GetByte computes and returns the next 8 bits in the stream.
@@ -361,7 +361,7 @@ func (c Cipher) InternalInfo() {
 		fmt.Printf("Register %d: %X\n", index, item)
 	}
 	for index, item := range c.SRTaps {
-		fmt.Printf("Tapcode %d: %X\n", index, item)
+		fmt.Printf("Tapcode %d: %6X\n", index, item)
 	}
 }
 
