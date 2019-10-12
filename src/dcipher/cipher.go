@@ -347,6 +347,13 @@ func NewCipher(initVector [16]byte) Cipher {
 	SRTaps[2] = tapCodes[2][(initVector[13]&3)<<4|(initVector[14]>>4)]
 	SRTaps[3] = tapCodes[3][(initVector[14]&15)<<2|(initVector[15]>>6)]
 	SRTaps[4] = tapCodes[4][initVector[15]&63]
+
+	for i := 0; i < 5; i++ {
+		if LFSRs[i] == 0 {
+			LFSRs[i] = 1
+		}
+	}
+
 	return Cipher{LFSRs, SRTaps}
 }
 
@@ -355,13 +362,36 @@ func (c Cipher) GetByte() byte {
 	return 0
 }
 
+// Tick returns the next bit in the stream as a byte
+func (c *Cipher) Tick() byte {
+	num16sPlaceOnes, majorityBit := uint32(0), uint32(0)
+	for i := 0; i < 5; i++ {
+		num16sPlaceOnes += c.LFSRs[i] & 16
+	}
+	if num16sPlaceOnes > 32 {
+		majorityBit = 16 // majority bit in its place (10000₂)
+	}
+
+	for i := 0; i < 5; i++ {
+		if c.LFSRs[i]&16 == majorityBit {
+			if c.LFSRs[i]&1 == 1 {
+				c.LFSRs[i] = (c.LFSRs[i] >> 1) ^ c.SRTaps[i]
+			} else {
+				c.LFSRs[i] = c.LFSRs[i] >> 1
+			}
+		}
+	}
+
+	return byte(c.LFSRs[0]^c.LFSRs[1]^c.LFSRs[2]^c.LFSRs[3]^c.LFSRs[4]) & 1
+}
+
 // InternalInfo relates Cipher data to the terminal.
 func (c Cipher) InternalInfo() {
 	for index, item := range c.LFSRs {
-		fmt.Printf("Register %d: %X\n", index, item)
+		fmt.Printf("Register %d: %6X\n", index, item)
 	}
 	for index, item := range c.SRTaps {
-		fmt.Printf("Tapcode %d: %6X\n", index, item)
+		fmt.Printf("Tapcode %d:  %6X\n", index, item)
 	}
 }
 
@@ -401,3 +431,17 @@ func hexVal(c rune) int {
 		return 0
 	}
 }
+
+/*public virtual byte GetByte()
+{
+	// tick for a bit eight times and so build a byte
+	int result = Tick();
+	result = (result << 1) | Tick();
+	result = (result << 1) | Tick();
+	result = (result << 1) | Tick();
+	result = (result << 1) | Tick();
+	result = (result << 1) | Tick();
+	result = (result << 1) | Tick();
+	result = (result << 1) | Tick();
+	return (byte)result;
+}*/

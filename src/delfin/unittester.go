@@ -8,9 +8,11 @@ import (
 // entry point for unit tester
 func main() {
 	fmt.Println("Unit tester")
-	c := dcipher.NewCipher([16]byte{255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255})
+	c := dcipher.NewCipher([16]byte{}) //{255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255})
 	c.InternalInfo()
-	for i := 0; i < 8; i++ {
-		fmt.Println(c.GetByte())
+	for i := 0; i < 128; i++ {
+		fmt.Printf("%d", c.Tick())
 	}
+	fmt.Println()
+	c.InternalInfo()
 }
