@@ -1,7 +1,7 @@
 package main
 
 import (
-	"dcipher"
+	dcipher "cipher"
 	"fmt"
 )
 

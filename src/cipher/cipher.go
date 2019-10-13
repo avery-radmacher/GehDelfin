@@ -1,4 +1,4 @@
-package dcipher
+package cipher
 
 import "fmt"
 
@@ -388,7 +388,7 @@ func (c *Cipher) tick() byte {
 	return byte(c.LFSRs[0]^c.LFSRs[1]^c.LFSRs[2]^c.LFSRs[3]^c.LFSRs[4]) & 1
 }
 
-// String relates Cipher data to the terminal.
+// String represents the struct as a string.
 func (c Cipher) String() (result string) {
 	for index, item := range c.LFSRs {
 		result += fmt.Sprintf("Register %d: %6X\n", index, item)
