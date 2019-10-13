@@ -2,14 +2,14 @@ package cipher
 
 import "fmt"
 
-// Cipherv2 represents a stream cipher with a 128-bit seed and a very long period.
-type Cipherv2 struct {
+// Cipherv1 represents a stream cipher with a 128-bit seed and a very long period.
+type Cipherv1 struct {
 	LFSRs  [5]uint32
 	SRTaps [5]uint32
 }
 
-// NewCipherv2 creates a new cipher from a 16-byte seed.
-func NewCipherv2(initVector [16]byte) Cipherv2 {
+// NewCipherv1 creates a new cipher from a 16-byte seed.
+func NewCipherv1(initVector [16]byte) Cipherv1 {
 	LFSRs, SRTaps := [5]uint32{}, [5]uint32{}
 	var initInts [16]uint32
 	for index, item := range initVector {
@@ -32,11 +32,11 @@ func NewCipherv2(initVector [16]byte) Cipherv2 {
 		}
 	}
 
-	return Cipherv2{LFSRs, SRTaps}
+	return Cipherv1{LFSRs, SRTaps}
 }
 
 // GetByte computes and returns the next 8 bits in the stream.
-func (c *Cipherv2) GetByte() (result byte) {
+func (c *Cipherv1) GetByte() (result byte) {
 	for i := 0; i < 8; i++ {
 		result = (result << 1) | c.tick()
 	}
@@ -44,31 +44,20 @@ func (c *Cipherv2) GetByte() (result byte) {
 }
 
 // tick returns the next bit in the stream as a byte
-func (c *Cipherv2) tick() byte {
-	num16sPlaceOnes, majorityBit := uint32(0), uint32(0)
+func (c *Cipherv1) tick() byte {
 	for i := 0; i < 5; i++ {
-		num16sPlaceOnes += c.LFSRs[i] & 16
-	}
-	if num16sPlaceOnes > 32 {
-		majorityBit = 16 // majority bit in its place (10000₂)
-	}
-
-	for i := 0; i < 5; i++ {
-		if c.LFSRs[i]&16 == majorityBit {
-			if c.LFSRs[i]&1 == 1 {
-				c.LFSRs[i] = (c.LFSRs[i] >> 1) ^ c.SRTaps[i]
-			} else {
-				c.LFSRs[i] = c.LFSRs[i] >> 1
-			}
+		if c.LFSRs[i]&1 == 1 {
+			c.LFSRs[i] = (c.LFSRs[i] >> 1) ^ c.SRTaps[i]
+		} else {
+			c.LFSRs[i] = c.LFSRs[i] >> 1
 		}
 	}
-
 	return byte(c.LFSRs[0]^c.LFSRs[1]^c.LFSRs[2]^c.LFSRs[3]^c.LFSRs[4]) & 1
 }
 
 // String represents the Cipher as a string.
-func (c Cipherv2) String() (result string) {
-	result += "Cipherv2 object:\n"
+func (c Cipherv1) String() (result string) {
+	result += "Cipherv1 object:\n"
 	for index, item := range c.LFSRs {
 		result += fmt.Sprintf("Register %d: %6X\n", index, item)
 	}

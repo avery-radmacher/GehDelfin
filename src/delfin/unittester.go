@@ -8,7 +8,7 @@ import (
 // entry point for unit tester
 func main() {
 	fmt.Println("Unit tester")
-	c := dcipher.NewCipher([16]byte{}) //{255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255})
+	c := dcipher.NewCipherv2([16]byte{}) //{255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255})
 	//fmt.Println(c)
 	m := make(map[byte]uint16)
 	for i := 0; i < 256*1024; i++ {
