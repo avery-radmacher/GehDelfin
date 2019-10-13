@@ -2,6 +2,11 @@ package cipher
 
 import "fmt"
 
+// A Cipher represents a stream cipher which can return masking bytes.
+type Cipher interface {
+	GetByte() byte
+}
+
 // Cipherv2 represents a stream cipher with a 128-bit seed and a very long period.
 type Cipherv2 struct {
 	LFSRs  [5]uint32
