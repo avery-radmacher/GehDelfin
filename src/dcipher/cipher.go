@@ -358,12 +358,15 @@ func NewCipher(initVector [16]byte) Cipher {
 }
 
 // GetByte computes and returns the next 8 bits in the stream.
-func (c Cipher) GetByte() byte {
-	return 0
+func (c *Cipher) GetByte() (result byte) {
+	for i := 0; i < 8; i++ {
+		result = (result << 1) | c.tick()
+	}
+	return
 }
 
 // Tick returns the next bit in the stream as a byte
-func (c *Cipher) Tick() byte {
+func (c *Cipher) tick() byte {
 	num16sPlaceOnes, majorityBit := uint32(0), uint32(0)
 	for i := 0; i < 5; i++ {
 		num16sPlaceOnes += c.LFSRs[i] & 16
@@ -385,63 +388,13 @@ func (c *Cipher) Tick() byte {
 	return byte(c.LFSRs[0]^c.LFSRs[1]^c.LFSRs[2]^c.LFSRs[3]^c.LFSRs[4]) & 1
 }
 
-// InternalInfo relates Cipher data to the terminal.
-func (c Cipher) InternalInfo() {
+// String relates Cipher data to the terminal.
+func (c Cipher) String() (result string) {
 	for index, item := range c.LFSRs {
-		fmt.Printf("Register %d: %6X\n", index, item)
+		result += fmt.Sprintf("Register %d: %6X\n", index, item)
 	}
 	for index, item := range c.SRTaps {
-		fmt.Printf("Tapcode %d:  %6X\n", index, item)
+		result += fmt.Sprintf("Tapcode %d:  %6X\n", index, item)
 	}
+	return
 }
-
-func hexVal(c rune) int {
-	switch c {
-	case '1':
-		return 1
-	case '2':
-		return 2
-	case '3':
-		return 3
-	case '4':
-		return 4
-	case '5':
-		return 5
-	case '6':
-		return 6
-	case '7':
-		return 7
-	case '8':
-		return 8
-	case '9':
-		return 9
-	case 'A', 'a':
-		return 10
-	case 'B', 'b':
-		return 11
-	case 'C', 'c':
-		return 12
-	case 'D', 'd':
-		return 13
-	case 'E', 'e':
-		return 14
-	case 'F', 'f':
-		return 15
-	default:
-		return 0
-	}
-}
-
-/*public virtual byte GetByte()
-{
-	// tick for a bit eight times and so build a byte
-	int result = Tick();
-	result = (result << 1) | Tick();
-	result = (result << 1) | Tick();
-	result = (result << 1) | Tick();
-	result = (result << 1) | Tick();
-	result = (result << 1) | Tick();
-	result = (result << 1) | Tick();
-	result = (result << 1) | Tick();
-	return (byte)result;
-}*/
