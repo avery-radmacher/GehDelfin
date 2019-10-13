@@ -2,8 +2,8 @@ package cipher
 
 import "fmt"
 
-// Cipher represents a stream cipher with a 128-bit seed and a very long period.
-type Cipher struct {
+// Cipherv2 represents a stream cipher with a 128-bit seed and a very long period.
+type Cipherv2 struct {
 	LFSRs  [5]uint32
 	SRTaps [5]uint32
 }
@@ -331,7 +331,7 @@ var tapCodes = [5][64]uint32{
 		0x4004B2}}
 
 // NewCipher creates a new cipher from a 16-byte seed.
-func NewCipher(initVector [16]byte) Cipher {
+func NewCipher(initVector [16]byte) Cipherv2 {
 	LFSRs, SRTaps := [5]uint32{}, [5]uint32{}
 	var initInts [16]uint32
 	for index, item := range initVector {
@@ -354,11 +354,11 @@ func NewCipher(initVector [16]byte) Cipher {
 		}
 	}
 
-	return Cipher{LFSRs, SRTaps}
+	return Cipherv2{LFSRs, SRTaps}
 }
 
 // GetByte computes and returns the next 8 bits in the stream.
-func (c *Cipher) GetByte() (result byte) {
+func (c *Cipherv2) GetByte() (result byte) {
 	for i := 0; i < 8; i++ {
 		result = (result << 1) | c.tick()
 	}
@@ -366,7 +366,7 @@ func (c *Cipher) GetByte() (result byte) {
 }
 
 // Tick returns the next bit in the stream as a byte
-func (c *Cipher) tick() byte {
+func (c *Cipherv2) tick() byte {
 	num16sPlaceOnes, majorityBit := uint32(0), uint32(0)
 	for i := 0; i < 5; i++ {
 		num16sPlaceOnes += c.LFSRs[i] & 16
@@ -388,8 +388,9 @@ func (c *Cipher) tick() byte {
 	return byte(c.LFSRs[0]^c.LFSRs[1]^c.LFSRs[2]^c.LFSRs[3]^c.LFSRs[4]) & 1
 }
 
-// String represents the struct as a string.
-func (c Cipher) String() (result string) {
+// String represents the Cipher as a string.
+func (c Cipherv2) String() (result string) {
+	result += "Cipherv2 object:\n"
 	for index, item := range c.LFSRs {
 		result += fmt.Sprintf("Register %d: %6X\n", index, item)
 	}
