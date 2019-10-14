@@ -3,16 +3,20 @@ package main
 import (
 	dcipher "cipher"
 	"fmt"
+	"os"
 )
 
 // entry point for unit tester
 func main() {
 	fmt.Println("Unit tester")
-	c := dcipher.NewCipherv2("delfin")
+	password := "delfin"
+	if len(os.Args) > 1 {
+		password = os.Args[1]
+	}
+	c := dcipher.NewCipherv2(password)
 	m := make(map[byte]uint16)
 	for i := 0; i < 256*1024; i++ {
 		val := c.GetByte()
-		//fmt.Printf("%2X ", val)
 		m[val]++
 	}
 	fmt.Println()
