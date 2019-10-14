@@ -9,12 +9,13 @@ type Cipherv2 struct {
 }
 
 // NewCipherv2 creates a new cipher from a 16-byte seed.
-func NewCipherv2(initVector [16]byte) Cipherv2 {
-	LFSRs, SRTaps := [5]uint32{}, [5]uint32{}
+func NewCipherv2(password string) Cipherv2 {
+	initVector := vector(password, 16)
 	var initInts [16]uint32
 	for index, item := range initVector {
 		initInts[index] = uint32(item)
 	}
+	LFSRs, SRTaps := [5]uint32{}, [5]uint32{}
 	LFSRs[0] = uint32((initInts[0] << 9) | (initInts[1] << 1) | (initInts[2] >> 7))
 	LFSRs[1] = uint32(((initInts[2] & 127) << 11) | (initInts[3] << 3) | (initInts[4] >> 5))
 	LFSRs[2] = uint32(((initInts[4] & 7) << 14) | (initInts[5] << 6) | (initInts[6] >> 2)) // TODO why not ... & 31 ? ignoring two bits.
@@ -31,7 +32,6 @@ func NewCipherv2(initVector [16]byte) Cipherv2 {
 			LFSRs[i] = 1
 		}
 	}
-
 	return Cipherv2{LFSRs, SRTaps}
 }
 

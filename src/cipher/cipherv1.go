@@ -9,15 +9,16 @@ type Cipherv1 struct {
 }
 
 // NewCipherv1 creates a new cipher from a 16-byte seed.
-func NewCipherv1(initVector [16]byte) Cipherv1 {
-	LFSRs, SRTaps := [5]uint32{}, [5]uint32{}
+func NewCipherv1(password string) Cipherv1 {
+	initVector := vector(password, 16)
 	var initInts [16]uint32
 	for index, item := range initVector {
 		initInts[index] = uint32(item)
 	}
+	LFSRs, SRTaps := [5]uint32{}, [5]uint32{}
 	LFSRs[0] = uint32((initInts[0] << 9) | (initInts[1] << 1) | (initInts[2] >> 7))
 	LFSRs[1] = uint32(((initInts[2] & 127) << 11) | (initInts[3] << 3) | (initInts[4] >> 5))
-	LFSRs[2] = uint32(((initInts[4] & 7) << 14) | (initInts[5] << 6) | (initInts[6] >> 2)) // TODO why not ... & 31 ? ignoring two bits.
+	LFSRs[2] = uint32(((initInts[4] & 7) << 14) | (initInts[5] << 6) | (initInts[6] >> 2))
 	LFSRs[3] = uint32(((initInts[6] & 3) << 19) | (initInts[7] << 11) | (initInts[8] << 3) | (initInts[9] >> 5))
 	LFSRs[4] = uint32(((initInts[9] & 31) << 18) | (initInts[10] << 10) | (initInts[11] << 2) | (initInts[12] >> 6))
 	SRTaps[0] = tapCodes[0][initVector[12]&63]
@@ -31,7 +32,6 @@ func NewCipherv1(initVector [16]byte) Cipherv1 {
 			LFSRs[i] = 1
 		}
 	}
-
 	return Cipherv1{LFSRs, SRTaps}
 }
 
