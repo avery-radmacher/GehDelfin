@@ -7,6 +7,8 @@ cipher types.
 */
 package cipher
 
+import "crypto/sha256"
+
 // A Cipher represents a stream cipher which can return masking bytes.
 type Cipher interface {
 	GetByte() byte
@@ -333,3 +335,10 @@ var tapCodes = [5][64]uint32{
 		0x40049C,
 		0x4004AA,
 		0x4004B2}}
+
+//
+// vector returns the first	length	bytes of the SHA256 checksum of a string.
+func vector(password string, length int) []byte {
+	sum := sha256.Sum256([]byte(password))
+	return sum[:length]
+}
