@@ -15,8 +15,9 @@ func main() {
 	}
 	c := dcipher.NewCipherv2(password)
 	m := make(map[byte]uint16)
-	for i := 0; i < 256*1024; i++ {
-		val := c.GetByte()
+	b := make([]byte, 256*1024)
+	c.Crypt(b)
+	for _, val := range b {
 		m[val]++
 	}
 	fmt.Println()

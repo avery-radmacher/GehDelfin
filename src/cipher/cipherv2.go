@@ -35,6 +35,13 @@ func NewCipherv2(password string) Cipherv2 {
 	return Cipherv2{LFSRs, SRTaps}
 }
 
+// Crypt encrypts or decrypts the bytes fed into it in-place.
+func (c *Cipherv2) Crypt(data []byte) {
+	for index := range data {
+		data[index] ^= c.GetByte()
+	}
+}
+
 // GetByte computes and returns the next 8 bits in the stream.
 func (c *Cipherv2) GetByte() (result byte) {
 	for i := 0; i < 8; i++ {

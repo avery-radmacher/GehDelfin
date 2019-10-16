@@ -12,6 +12,7 @@ import "crypto/sha256"
 // A Cipher represents a stream cipher which can return masking bytes.
 type Cipher interface {
 	GetByte() byte
+	Crypt(data []byte)
 }
 
 var tapCodes = [5][64]uint32{
