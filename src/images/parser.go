@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"image"
 	"image/color"
-	_ "image/png"
+	"image/png"
 	"log"
 	"os"
 )
@@ -25,11 +25,17 @@ func Test() {
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
 			r, g, b, a := m.At(x, y).RGBA()
-			m.(*image.RGBA).Set(x, y, color.RGBA{byte(r >> 15 << 7), byte(g >> 15 << 7), byte(b >> 15 << 7), byte(a >> 15 << 7)})
-			color := r>>13&4 | g>>14&2 | b>>15
-			if color == 4 {
-				fmt.Printf("%04d.%04d: \n", x, y)
-			}
+			m.(*image.RGBA).Set(x, y, color.RGBA{byte(r >> 15 * 255), byte(g >> 15 * 255), byte(b >> 15 * 255), byte(a)})
 		}
+	}
+
+	outputFile, err := os.Create(os.Args[3])
+	if err != nil {
+		panic(err.Error())
+	}
+	encoder := png.Encoder{CompressionLevel: png.BestCompression}
+	err = encoder.Encode(outputFile, m)
+	if err != nil {
+		panic(err.Error())
 	}
 }
