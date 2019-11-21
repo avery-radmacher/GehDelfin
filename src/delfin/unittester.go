@@ -3,6 +3,7 @@ package main
 import (
 	dcipher "cipher"
 	"fmt"
+	"header"
 	"images"
 	"os"
 )
@@ -37,5 +38,7 @@ func main() {
 		fmt.Println(c)
 	case "image":
 		images.Test()
+	case "header":
+		header.Test()
 	}
 }
