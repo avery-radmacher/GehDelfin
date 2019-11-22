@@ -27,10 +27,11 @@ func NewHeader() Header {
 	return &header{
 		IsComplete:    false,
 		IsUnsupported: false,
+		FileSize:      0,
 		UseOldCipher:  false,
 		HeaderVersion: CurrentVersion,
-		byteScan:      0,
-		HeaderSize:    5}
+		HeaderSize:    5,
+		byteScan:      0}
 }
 
 func (h *header) AddByte(b byte) {
@@ -83,9 +84,13 @@ func (h header) ToBuffer() (buffer []byte) {
 	return
 }
 
+// Test runs a unit test on header
 func Test() {
 	fmt.Println("header test")
-	h1, h2 := NewHeader(), NewHeader()
-	h1.(*header).IsComplete = true
-	fmt.Printf("%t : %t\n", h1.(*header).IsComplete, h2.(*header).IsComplete)
+	h1 := NewHeader()
+	buffer := []byte{0x02, 0x00, 0x00, 0x01, 0x00}
+	for i := 0; !h1.(*header).IsComplete && !h1.(*header).IsUnsupported; i++ {
+		h1.AddByte(buffer[i])
+	}
+	fmt.Println(h1)
 }
