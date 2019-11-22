@@ -12,7 +12,7 @@ type Header struct {
 	IsComplete    bool
 	IsUnsupported bool
 	FileSize      int32
-	UseOldCipher  bool
+	CipherVersion int
 	HeaderVersion byte
 	HeaderSize    int
 	byteScan      byte
@@ -24,7 +24,7 @@ func NewHeader() Header {
 		IsComplete:    false,
 		IsUnsupported: false,
 		FileSize:      0,
-		UseOldCipher:  false,
+		CipherVersion: 1,
 		HeaderVersion: CurrentVersion,
 		HeaderSize:    5,
 		byteScan:      0}
@@ -49,7 +49,7 @@ func (h *Header) AddByte(b byte) {
 	}
 
 	if h.HeaderVersion == 0 {
-		h.UseOldCipher = true // HV0 uses deprecated short-circuiting Cipherv1
+		h.CipherVersion = 0 // HV0 uses deprecated short-circuiting Cipherv1
 	}
 
 	if h.HeaderVersion == 0 || h.HeaderVersion == 1 {
