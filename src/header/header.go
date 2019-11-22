@@ -1,7 +1,5 @@
 package header
 
-import "fmt"
-
 // CurrentVersion is the latest header version, used for all new encryptions.
 const CurrentVersion = 1
 
@@ -80,15 +78,4 @@ func (h Header) ToBuffer() (buffer []byte) {
 	buffer[3] = byte(h.FileSize >> 8 & 255)
 	buffer[4] = byte(h.FileSize & 255)
 	return
-}
-
-// Test runs a unit test on header
-func Test() {
-	fmt.Println("header test")
-	h1 := NewHeader()
-	buffer := []byte{0x02, 0x00, 0x00, 0x01, 0x00}
-	for i := 0; !h1.IsComplete && !h1.IsUnsupported; i++ {
-		h1.AddByte(buffer[i])
-	}
-	fmt.Println(h1)
 }
