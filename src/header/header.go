@@ -6,13 +6,9 @@ import "fmt"
 const CurrentVersion = 1
 
 // Header represents the header data at the beginning of an encrypted file,
-// including methods for converting the header to and from buffers.
-type Header interface {
-	AddByte(b byte)
-	ToBuffer() []byte
-}
-
-type header struct {
+// including methods for converting the header to and from buffers. As the
+// header is updated, the structure code itself changes.
+type Header struct {
 	IsComplete    bool
 	IsUnsupported bool
 	FileSize      int32
@@ -24,7 +20,7 @@ type header struct {
 
 // NewHeader returns a new header of the most current version.
 func NewHeader() Header {
-	return &header{
+	return Header{
 		IsComplete:    false,
 		IsUnsupported: false,
 		FileSize:      0,
@@ -34,7 +30,8 @@ func NewHeader() Header {
 		byteScan:      0}
 }
 
-func (h *header) AddByte(b byte) {
+// AddByte reads a byte as if from a header buffer and updates internal state.
+func (h *Header) AddByte(b byte) {
 	// quit if unsupported header
 	if h.IsUnsupported {
 		return
@@ -71,7 +68,8 @@ func (h *header) AddByte(b byte) {
 	// new header versions are handled here with new ifs
 }
 
-func (h header) ToBuffer() (buffer []byte) {
+// ToBuffer converts the header to its buffer representation.
+func (h Header) ToBuffer() (buffer []byte) {
 	// HV0 & HV1:
 	//  0: header version
 	//	1–4: filesize (int32)
@@ -89,7 +87,7 @@ func Test() {
 	fmt.Println("header test")
 	h1 := NewHeader()
 	buffer := []byte{0x02, 0x00, 0x00, 0x01, 0x00}
-	for i := 0; !h1.(*header).IsComplete && !h1.(*header).IsUnsupported; i++ {
+	for i := 0; !h1.IsComplete && !h1.IsUnsupported; i++ {
 		h1.AddByte(buffer[i])
 	}
 	fmt.Println(h1)
